@@ -42,7 +42,7 @@ struct CS {
     string name_CS;
     int number_of_workshops;
     int workshops_in_operation;
-    string effectiveness;
+    int effectiveness;
 };
 
 void inputPipeInfo(Pipe& pipe) {
@@ -100,8 +100,85 @@ void printCSInfo(const CS& cs) {
     cout << endl;
 }
 
-void editInRepairStatus(CS& cs) {
+void editInRepairStatus(Pipe& pipe) {
+    cout << "Изменить признак в ремонте(0 - оставить, 1 - изменить): " << endl;
+    if (CorrectNumber(0, 1)) {
+        pipe.in_repairing = !pipe.in_repairing;
+    }
+    cout << endl;
+}
+
+void editCS(CS& cs) {
     cout << "Изменить количество цехов в работе: " << endl;
     cs.workshops_in_operation = CorrectNumber(0, cs.number_of_workshops);
 }
 
+void View(Pipe& pipe, CS& cs)
+{
+
+    while (1) {
+        
+        cout << "0. Назад\n" <<
+            "1. Список труб\n" <<
+            "2. Список КС" << endl;
+
+
+        switch (CorrectNumber(0, 2)) {
+        case 1: {
+            printPipeInfo(pipe);
+            break;
+        }
+        case 2: {
+            printCSInfo(cs);
+            break;
+        }
+
+        case 0: {
+            return;
+        }
+
+        }
+    }
+}
+
+
+int main() {
+    setlocale(LC_ALL, "ru");
+
+    Pipe pipe;
+    CS cs;
+    //int choice;
+
+    while (true) {
+        cout << "\n1. Добавить трубу\n" <<
+            "2. Добавить КС\n" <<
+            "3. Просмотр всех объектов\n" <<
+            "4. Редактировать трубу\n" <<
+            "5. Редактировать КС\n" <<
+            "6. Сохранить\n" <<
+            "7. Загрузить\n" <<
+            "0. Выход\n" << endl;
+
+        switch (CorrectNumber(0, 7)) {
+        case 1:
+            inputPipeInfo(pipe);
+            break;
+        case 2:
+            inputCSInfo(cs);
+            break;
+        case 3:
+            View(pipe, cs);
+            break;
+        case 4:
+            editInRepairStatus(pipe);
+            break;
+        case 0:
+            return 0;
+        default:
+            cout << "Invalid choice!" << endl;
+            break;
+        }
+    }
+
+    return 0;
+}
