@@ -99,3 +99,9 @@ void printCSInfo(const CS& cs) {
     cout << "Эффективность: " << cs.effectiveness << std::endl;
     cout << endl;
 }
+
+void editInRepairStatus(CS& cs) {
+    cout << "Изменить количество цехов в работе: " << endl;
+    cs.workshops_in_operation = CorrectNumber(0, cs.number_of_workshops);
+}
+
