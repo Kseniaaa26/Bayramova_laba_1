@@ -84,3 +84,18 @@ void inputCSInfo(CS& cs) {
     cs.effectiveness = CorrectNumber(1, 3);
 }
 
+void printPipeInfo(const Pipe& pipe) {
+    cout << "Труба: " << pipe.name_p << std::endl;
+    cout << "Длина: " << pipe.length << std::endl;
+    cout << "Диаметр: " << pipe.diameter << std::endl;
+    cout << "Состояние(0 - в ремонте, 1 - в работе): " << (pipe.in_repairing ? "true" : "false") << std::endl;
+    cout << endl;
+}
+
+void printCSInfo(const CS& cs) {
+    cout << "КС: " << cs.name_CS << std::endl;
+    cout << "Количество цехов: " << cs.number_of_workshops << std::endl;
+    cout << "Количество цехов в работе: " << cs.workshops_in_operation << std::endl;
+    cout << "Эффективность: " << cs.effectiveness << std::endl;
+    cout << endl;
+}
