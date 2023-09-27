@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -57,7 +58,7 @@ void inputPipeInfo(Pipe& pipe) {
 
     cout << "Введите диаметр трубы: ";
     pipe.diameter = CorrectNumber(0, INT_MAX);
-    
+
     cout << "Введите состояние трубы(0 - в ремонте, 1 - в работе):" << pipe.in_repairing << endl;
     if (CorrectNumber(0, 1)) {
         pipe.in_repairing = true;
@@ -85,18 +86,18 @@ void inputCSInfo(CS& cs) {
 }
 
 void printPipeInfo(const Pipe& pipe) {
-    cout << "Труба: " << pipe.name_p << std::endl;
-    cout << "Длина: " << pipe.length << std::endl;
-    cout << "Диаметр: " << pipe.diameter << std::endl;
-    cout << "Состояние(0 - в ремонте, 1 - в работе): " << (pipe.in_repairing ? "true" : "false") << std::endl;
+    cout << "Труба: " << pipe.name_p << endl;
+    cout << "Длина: " << pipe.length << endl;
+    cout << "Диаметр: " << pipe.diameter << endl;
+    cout << "Состояние(0 - в ремонте, 1 - в работе): " << (pipe.in_repairing ? "true" : "false") << endl;
     cout << endl;
 }
 
 void printCSInfo(const CS& cs) {
-    cout << "КС: " << cs.name_CS << std::endl;
-    cout << "Количество цехов: " << cs.number_of_workshops << std::endl;
-    cout << "Количество цехов в работе: " << cs.workshops_in_operation << std::endl;
-    cout << "Эффективность: " << cs.effectiveness << std::endl;
+    cout << "КС: " << cs.name_CS << endl;
+    cout << "Количество цехов: " << cs.number_of_workshops << endl;
+    cout << "Количество цехов в работе: " << cs.workshops_in_operation << endl;
+    cout << "Эффективность: " << cs.effectiveness << endl;
     cout << endl;
 }
 
@@ -142,12 +143,23 @@ void View(Pipe& pipe, CS& cs)
 }
 
 
+void SavePipe(Pipe& pipe, CS& cs) {
+    ofstream file;
+    file.open("pipe_data.txt");
+    file << "Труба: " << pipe.name_p << "\nДлина: " << pipe.length << "\nДиаметр: " << pipe.diameter << "\nПризнак в ремонте(0 - в ремонте, 1 - в работе): " << pipe.in_repairing << endl;
+    file.close();
+
+    file.open("cs_data.txt");
+    file << "КС: " << cs.name_CS << "\nКоличество цехов: " << cs.number_of_workshops << "\nКоличество цехов в работе: " << cs.workshops_in_operation << "\nЭффективность: " << cs.effectiveness << endl;
+    file.close();
+}
+
+
 int main() {
     setlocale(LC_ALL, "ru");
 
     Pipe pipe;
     CS cs;
-    //int choice;
 
     while (true) {
         cout << "\n1. Добавить трубу\n" <<
@@ -160,23 +172,34 @@ int main() {
             "0. Выход\n" << endl;
 
         switch (CorrectNumber(0, 7)) {
+
         case 1:
             inputPipeInfo(pipe);
             break;
+
         case 2:
             inputCSInfo(cs);
             break;
+
         case 3:
             View(pipe, cs);
             break;
+
         case 4:
             editInRepairStatus(pipe);
             break;
+
+        case 5:
+            editCS(cs);
+            break;
+
+        case 6:
+            SavePipe(pipe,cs);
+            break;
+
         case 0:
             return 0;
-        default:
-            cout << "Invalid choice!" << endl;
-            break;
+
         }
     }
 
