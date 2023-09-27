@@ -120,8 +120,8 @@ void View(Pipe& pipe, CS& cs)
     while (1) {
         
         cout << "0. Назад\n" <<
-            "1. Список труб\n" <<
-            "2. Список КС" << endl;
+            "1. Просмотр трубы\n" <<
+            "2. Просмотр КС" << endl;
 
 
         switch (CorrectNumber(0, 2)) {
@@ -143,15 +143,42 @@ void View(Pipe& pipe, CS& cs)
 }
 
 
-void SavePipe(Pipe& pipe, CS& cs) {
-    ofstream file;
-    file.open("pipe_data.txt");
-    file << "Труба: " << pipe.name_p << "\nДлина: " << pipe.length << "\nДиаметр: " << pipe.diameter << "\nПризнак в ремонте(0 - в ремонте, 1 - в работе): " << pipe.in_repairing << endl;
-    file.close();
+void SaveInfo(Pipe& pipe, CS& cs) {
+    ofstream fout;
+    fout.open("pipe_data.txt", ios::out);
+    if (fout.is_open()) {
+        fout << pipe.name_p << endl << pipe.length << endl << pipe.diameter << endl << pipe.in_repairing << endl;
+        fout.close();
+    }
+    fout.open("cs_data.txt", ios::out);
+    if (fout.is_open()) {
+        fout << cs.name_CS << endl << cs.number_of_workshops << endl << cs.workshops_in_operation << endl << cs.effectiveness << endl;
+        fout.close();
+    }
+}
 
-    file.open("cs_data.txt");
-    file << "КС: " << cs.name_CS << "\nКоличество цехов: " << cs.number_of_workshops << "\nКоличество цехов в работе: " << cs.workshops_in_operation << "\nЭффективность: " << cs.effectiveness << endl;
-    file.close();
+void LoadConfiguration(Pipe& pipe, CS& cs) {
+
+    ifstream fin;
+    fin.open("pipe_data.txt", ios::in);
+    if (fin.is_open()) 
+    {
+        fin >> pipe.name_p;
+        fin >> pipe.length;
+        fin >> pipe.diameter;
+        fin >> pipe.in_repairing;
+        fin.close();
+    }
+
+    fin.open("cs_data.txt", ios::in);
+    if (fin.is_open())
+    {
+        fin >> cs.name_CS;
+        fin >> cs.number_of_workshops;
+        fin >> cs.workshops_in_operation;
+        fin >> cs.effectiveness;
+        fin.close();
+    }
 }
 
 
@@ -194,7 +221,10 @@ int main() {
             break;
 
         case 6:
-            SavePipe(pipe,cs);
+            SaveInfo(pipe,cs);
+            break;
+        case 7:
+            LoadConfiguration(pipe,cs);
             break;
 
         case 0:
