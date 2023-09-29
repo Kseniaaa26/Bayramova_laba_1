@@ -2,13 +2,12 @@
 #include <string>
 #include <fstream>
 
-#include <filesystem>
+
 
 
 using namespace std;
-//namespace fs = filesystem;
 
-inline int CorrectNumber(int min, int max) {
+ int CorrectNumber(int min, int max) {
     int x;
     while ((cin >> x).fail()
         || cin.peek() != '\n'
@@ -22,7 +21,7 @@ inline int CorrectNumber(int min, int max) {
     return x;
 }
 
-inline double CorrectNumber(double min, double max) {
+ double CorrectNumber(double min, double max) {
     double x;
     while ((cin >> x).fail()
         || cin.peek() != '\n'
@@ -50,11 +49,8 @@ struct CS {
     int effectiveness;
 };
 
-int flagPipe = 0;
-int flagCS = 0;
 
-
-int inputPipeInfo(Pipe& pipe) {
+void inputPipeInfo(Pipe& pipe) {
     
     cout << "Введите название трубы: ";
     cin.clear();
@@ -68,17 +64,10 @@ int inputPipeInfo(Pipe& pipe) {
     pipe.diameter = CorrectNumber(0, INT_MAX);
 
     cout << "Введите состояние трубы(0 - в ремонте, 1 - в работе): " << endl;
-    if (CorrectNumber(0, 1)) {
-        pipe.in_repairing = true;
-    }
-    else {
-        pipe.in_repairing = false;
-    }
-    flagPipe = 1;
-    return flagPipe;
+    pipe.in_repairing = CorrectNumber(0, 1);
 }
 
-int inputCSInfo(CS& cs) {
+void inputCSInfo(CS& cs) {
 
     cout << "Введите название КС: ";
     cin.clear();
@@ -93,9 +82,6 @@ int inputCSInfo(CS& cs) {
 
     cout << "Укажите эффективность(1,2,3)" << endl;
     cs.effectiveness = CorrectNumber(1, 3);
-
-    flagCS = 1;
-    return flagCS;
 }
 
 void printPipeInfo(const Pipe& pipe) {
@@ -113,6 +99,8 @@ void printCSInfo(const CS& cs) {
     cout << "Эффективность: " << cs.effectiveness << endl;
     cout << endl;
 }
+
+
 
 void editInRepairStatus(Pipe& pipe) {
     cout << "Изменить признак в ремонте(0 - оставить, 1 - изменить): " << endl;
@@ -134,12 +122,13 @@ void View(Pipe& pipe, CS& cs)
         
         cout << "0. Назад\n" <<
             "1. Просмотр трубы\n" <<
-            "2. Просмотр КС" << endl;
+            "2. Просмотр КС\n" << 
+            "3. Просмотр трубы и КС\n" << endl;
 
 
-        switch (CorrectNumber(0, 2)) {
+        switch (CorrectNumber(0, 3)) {
         case 1: {
-            if (flagPipe == 1){
+            if (pipe.name_p.size() != 0){
                 printPipeInfo(pipe);
                 break;
             }
@@ -150,12 +139,23 @@ void View(Pipe& pipe, CS& cs)
             }
         }
         case 2: {
-            if (flagCS == 1) {
+            if (cs.name_CS.size() != 0) {
                 printCSInfo(cs);
                 break;
             }
             else {
                 cout << "Нет КС, сначала добавьте её\n" << endl;
+                break;
+            }
+        }
+        case 3: {
+            if (cs.name_CS.size() != 0 && pipe.name_p.size() != 0) {
+                printPipeInfo(pipe);
+                printCSInfo(cs);
+                break;
+            }
+            else {
+                cout << "Нет КС и/или трубы\n" << endl;
                 break;
             }
         }
@@ -169,94 +169,94 @@ void View(Pipe& pipe, CS& cs)
 }
 
 
-void SavePipe(Pipe& pipe) {
-    ofstream fout;
-    fout.open("pipe_data.txt", ios::out);
-    if (fout.is_open()) {
-        fout << pipe.name_p << endl << pipe.length << endl << pipe.diameter << endl << pipe.in_repairing << endl;
-        fout.close();
-    }
-}
-void SaveCS(CS& cs) {
-    ofstream fout;
-    fout.open("cs_data.txt", ios::out);
-    if (fout.is_open()) {
-        fout << cs.name_CS << endl << cs.number_of_workshops << endl << cs.workshops_in_operation << endl << cs.effectiveness << endl;
-        fout.close();
-    }
-}
+void saveData(Pipe& pipe, CS& cs) {
+    ofstream file("data.txt");
+    if (pipe.name_p.size() != 0) {
+        if (file.is_open()) {
+            file << "Pipe" << endl;
+            file << pipe.name_p << endl;
+            file << pipe.length << endl;
+            file << pipe.diameter << endl;
+            file << pipe.in_repairing << endl;
 
-int LoadPipe(Pipe& pipe) {
-
-    ifstream fin;
-    fin.open("pipe_data.txt", ios::in);
-    if (fin.is_open())
-    {
-        int count = 0;
-        char buffer[1024];
-        while (!fin.eof() && count < 1024) {
-            // Считываем данные из файла
-            fin.read(buffer, sizeof(buffer));
-
-            // Увеличиваем значение счетчика на количество считанных байт
-            count += fin.gcount();
-        }
-
-        fin.close();
-
-        if (count == 0) {
-            cout << "Пустой файл, сохраните трубу" << endl;
-            return 0;
         }
         else {
-            fin.open("pipe_data.txt", ios::in);
-            fin >> pipe.name_p;
-            fin >> pipe.length;
-            fin >> pipe.diameter;
-            fin >> pipe.in_repairing;
-            fin.close();
-            flagPipe = 1;
-            return flagPipe;
+            cout << "Не удалось открыть файл" << endl;
         }
     }
-    flagPipe = 1;
-    return flagPipe;
-}
-int LoadCS(CS& cs) {
-    ifstream fin;
-    fin.open("cs_data.txt", ios::in);
-    if (fin.is_open())
-    {
-        int count = 0;
-        char buffer[1024];
-        while (!fin.eof() && count < 1024) {
-            // Считываем данные из файла
-            fin.read(buffer, sizeof(buffer));
+    if (cs.name_CS.size() != 0) {
+        if (file.is_open()) {
+            file << "CS" << endl;
+            file << cs.name_CS << endl;
+            file << cs.number_of_workshops << endl;
+            file << cs.workshops_in_operation << endl;
+            file << cs.effectiveness << endl;
 
-            // Увеличиваем значение счетчика на количество считанных байт
-            count += fin.gcount();
-        }
-
-        fin.close();
-
-        if (count == 0) {
-            cout << "Пустой файл, сохраните КС" << endl;
-            return 0;
         }
         else {
-            fin.open("cs_data.txt", ios::in);
-            fin >> cs.name_CS;
-            fin >> cs.number_of_workshops;
-            fin >> cs.workshops_in_operation;
-            fin >> cs.effectiveness;
-            fin.close();
-
-            flagCS = 1;
-            return flagCS;
+            cout << "Не удалось открыть файл" << endl;
         }
+    }
+    file.close();
+    if (cs.name_CS.size() == 0 && pipe.name_p.size() == 0) {
+        cout << "Введите данные для сохранения" << endl;
     }
 }
 
+void loadData(Pipe& pipe, CS& cs) {
+    string line;
+    ifstream file("data.txt");
+    if (file.is_open()) {
+        getline(file, line);
+        if (line == "Pipe") {
+            getline(file, pipe.name_p);
+
+            getline(file, line);
+            pipe.length = stod(line);
+
+            getline(file, line);
+            pipe.diameter = stoi(line);
+
+            getline(file, line);
+            pipe.in_repairing = stoi(line);
+
+            getline(file, line);
+            if (line == "CS") {
+                getline(file, cs.name_CS);
+
+                getline(file, line);
+                cs.number_of_workshops = stoi(line);
+
+                getline(file, line);
+                cs.workshops_in_operation = stoi(line);
+
+                getline(file, line);
+                cs.effectiveness = stoi(line);
+            }
+            cout << "Данные успешно загрузились" << endl;
+        }
+        else if (line == "CS") {
+            getline(file, cs.name_CS);
+
+            getline(file, line);
+            cs.number_of_workshops = stoi(line);
+
+            getline(file, line);
+            cs.workshops_in_operation = stoi(line);
+
+            getline(file, line);
+            cs.effectiveness = stoi(line);
+            cout << "Данные успешно загрузились" << endl;
+        }
+        else {
+            cout << "Файл пуст" << endl;
+        }
+    }
+    else {
+        cout << "Не удалось открыть файл" << endl;
+    }
+    file.close();
+}
 
 int main() {
     
@@ -298,80 +298,11 @@ int main() {
             break;
 
         case 6:
-            
-                cout << "\n1. Сохранить трубу и КС\n" <<
-                    "2. Сохранить трубу\n" <<
-                    "3. Сохранить КС\n" << endl;
-
-                switch (CorrectNumber(0, 3)) {
-
-                case 1:
-                    if (flagPipe == 1 && flagCS == 1) {
-                        SavePipe(pipe);
-                        SaveCS(cs);
-                        break;
-                    }
-                    if (flagPipe == 1 && flagCS == 0) {
-                        cout << "\nДобавьте КС";
-                        break;
-                    }
-                    if (flagPipe == 0 && flagCS == 1) {
-                        cout << "\nДобавьте трубу";
-                        break;
-                    }
-                    else {
-                        cout << "\nДобавьте трубу и КС";
-                        break;
-                    }
-
-                case 2:
-                    if (flagPipe == 1) {
-                        SavePipe(pipe);
-                        break;
-                    }
-                    else {
-                        cout << "\nДобавьте трубу" << endl;
-                        break;
-                    }
-
-                case 3:
-                    if (flagCS == 1) {
-                        SaveCS(cs);
-                        break;
-                    }
-                    else {
-                        cout << "\nДобавьте КС" << endl;
-                        break;
-                    }
-                }
-            
-        case 8:
-             cout << "" << endl;
-             break;
+            saveData(pipe, cs);
+            break;
 
         case 7:
-            cout << "\n1. Загрузить трубу и КС\n" <<
-                "2. Загрузить трубу\n" <<
-                "3. Загрузить КС\n" << endl;
-
-            switch (CorrectNumber(1, 3)) {
-
-            case 1:
-                LoadPipe(pipe);
-                LoadCS(cs);
-                break;
-
-            case 2:
-                LoadPipe(pipe);
-                break;
-               
-
-
-            case 3:
-                LoadCS(cs);
-                break;
-              
-            }
+            loadData(pipe, cs);
             break;
 
         case 0:
