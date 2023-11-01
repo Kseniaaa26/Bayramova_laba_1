@@ -103,16 +103,27 @@ void printCSInfo(const CS& cs) {
 
 
 void editInRepairStatus(Pipe& pipe) {
-    cout << "Изменить признак в ремонте(0 - оставить, 1 - изменить): " << endl;
-    if (CorrectNumber(0, 1)) {
-        pipe.in_repairing = !pipe.in_repairing;
+    if (pipe.name_p.size() != 0) {
+
+        cout << "Изменить признак в ремонте(0 - оставить, 1 - изменить): " << endl;
+        if (CorrectNumber(0, 1)) {
+            pipe.in_repairing = !pipe.in_repairing;
+        }
+    }
+    else {
+        cout << "Добавьте трубу";
     }
     cout << endl;
 }
 
 void editCS(CS& cs) {
-    cout << "Изменить количество цехов в работе: " << endl;
-    cs.workshops_in_operation = CorrectNumber(0, cs.number_of_workshops);
+    if (cs.name_CS.size() != 0) {
+        cout << "Изменить количество цехов в работе: " << endl;
+        cs.workshops_in_operation = CorrectNumber(0, cs.number_of_workshops);
+    }
+    else {
+        cout << "Добавьте КС";
+    }
 }
 
 void View(Pipe& pipe, CS& cs)
