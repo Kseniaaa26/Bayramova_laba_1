@@ -1,6 +1,8 @@
 #include "Pipe.h"
 
-int Pipe::MaxId = 0;
+using namespace std;
+
+//int Pipe::MaxId = 0;
 
 Pipe::Pipe() {
     name = "Non";
@@ -10,26 +12,28 @@ Pipe::Pipe() {
     ID = ++MaxId;
 }
 
-Pipe::Pipe(string name, double length, int diameter, bool in_repairing) {
+Pipe::Pipe(string name, float length, int diameter, bool in_repairing) {
     this->name = name;
     this->length = length;
     this->diameter = diameter;
     this->in_repairing = in_repairing;
 }
 
-void Pipe::InputPipeInfo() {
+void Pipe::InputInfo() {
+    
     cout << "¬ведите название трубы: ";
     cin.ignore(INT_MAX, '\n');
     getline(cin, name);
 
     cout << "¬ведите длину трубы: ";
-    length = CorrectNumber(0.0, DBL_MAX);
+    length = CorrectNumber(0.0, 10000.);
 
     cout << "¬ведите диаметр трубы: ";
     diameter = CorrectNumber(0, INT_MAX);
 
     cout << "¬ведите состо€ние трубы(0 - в ремонте, 1 - в работе): " << endl;
     in_repairing = CorrectNumber(0, 1);
+    
 }
 
 void Pipe::PrintInfo() {
@@ -38,29 +42,20 @@ void Pipe::PrintInfo() {
     cout << "ƒиаметр: " << diameter << endl;
     cout << "—осто€ние(0 - в ремонте, 1 - в работе): " << (in_repairing ? "true" : "false") << endl;
     cout << "ID" << ID << endl;
+
+    
 }
 
-void Pipe::Edit(const int answer) {
-    if (answer) in_repairing = true;
-    else in_repairing = false;
+void Pipe::Edit(int status) {
+    if (status) in_repairing = !in_repairing;
 }
 
-void Pipe::editInRepairStatus()
+void Pipe::Edit()
 {
     PrintInfo();
     cout << "»зменить признак в ремонте(0 - оставить, 1 - изменить):" << endl;
     Edit(CorrectNumber(0, 1));
-}
-
-
-ostream& operator << (ostream& out, const Pipe& pipe)
-{
-
-    return out;
-}
-istream& operator >> (istream& in, Pipe& pipe)
-{
-    return in;
+    
 }
 
 ofstream& operator << (ofstream& file, const Pipe& pipe) {

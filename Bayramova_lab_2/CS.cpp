@@ -1,11 +1,11 @@
 ﻿#include "CS.h"
 
-int CS::MaxId = 0;
+using namespace std;
 
 CS::CS() {
     name = "Non";
     number_of_workshops = 0;
-    this->workshops_in_operation = 0;
+    workshops_in_operation = 0;
     effectiveness = 0;
     ID = ++MaxId;
 }
@@ -17,11 +17,12 @@ CS::CS(string name, int number_of_workshops, int workshops_in_operation, int eff
     this->effectiveness = effectiveness;
 }
 
-void CS::inputCSInfo() {
+void CS::InputInfo() {
 
     cout << "Введите название КС: ";
     cin.ignore(INT_MAX, '\n');
     getline(cin, name);
+    //name = input_string(cin);
 
     cout << "Введите количество цехов КС: ";
     number_of_workshops = CorrectNumber(0, 50);
@@ -35,6 +36,7 @@ void CS::inputCSInfo() {
 
 
 void CS::PrintInfo() {
+    
     cout << "КС: " << name << endl;
     cout << "Количество цехов: " << number_of_workshops << endl;
     cout << "Количество цехов в работе: " << workshops_in_operation << endl;
@@ -47,7 +49,7 @@ void CS::Edit(int active) {
 }
 
 
-void CS::EditCS()
+void CS::Edit()
 {
 
     PrintInfo();
@@ -70,11 +72,13 @@ ofstream& operator << (ofstream& file, const CS& cs) {
 
 ifstream& operator >> (ifstream& file, CS& cs) {
     if (file.is_open()) {
+        //file >> ws;
         file >> cs.name;
         file >> cs.number_of_workshops;
         file >> cs.workshops_in_operation;
         file >> cs.effectiveness;
         file >> cs.ID;
+        
     }
     return file;
 }
