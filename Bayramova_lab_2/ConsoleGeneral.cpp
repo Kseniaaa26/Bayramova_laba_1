@@ -2,12 +2,21 @@
 #include "Console_func.h"
 #include "CS.h"
 #include "Pipe.h"
+#include <format>
+#include <chrono>
 
 using namespace std;
+using namespace chrono;
 
 int main()
 {
     setlocale(LC_ALL, "ru");
+
+    redirect_stream_wrapper cerr_out(cerr);
+    string time = format("{:%d_%m_%Y_%H_%M_%OS}", system_clock::now() + hours(3));
+    ofstream logfile("Logs/log_" + time);
+    if (logfile)
+        cerr_out.redirect(logfile);
 
     TransportSystem Pipeline_Gas_Transpartation;
 
@@ -24,7 +33,7 @@ int main()
             "0. Выход\n" << endl;
 
 
-        switch (CorrectNumber(0, 8))
+        switch (CorrectNumber(cin, 0, 8))
         {
 
         case 1: {

@@ -4,6 +4,7 @@
 #include "Pipe.h"
 #include "CS.h"
 #include "header.h"
+#include <format>
 
 using namespace std;
 
@@ -40,7 +41,7 @@ vector<int> Find_By_Filter(unordered_map<int, T1>& elements, Filter<T1, T2> filt
 TransportSystem::TransportSystem()
 {}
 
-void TransportSystem::LogUserAction(const std::string& action, int ID)
+/*void TransportSystem::LogUserAction(const std::string& action, int ID)
 {
     std::ofstream logFile("user_actions_log.txt", std::ios::app);
     if (logFile.is_open())
@@ -52,7 +53,7 @@ void TransportSystem::LogUserAction(const std::string& action, int ID)
     {
         std::cerr << "Не удалось открыть файл для логирования." << std::endl;
     }
-}
+}*/
 
 //---------------CREATE-------------------
 
@@ -62,8 +63,8 @@ void TransportSystem::InputPipe()
     pipe.InputInfo();
     pipes.insert({ pipe.GetID(), pipe });
 
-    int ID = pipe.GetID();
-    LogUserAction("Добавление трубы", ID);
+    //int ID = pipe.GetID();
+    //LogUserAction("Добавление трубы", ID);
 }
 
 
@@ -73,8 +74,8 @@ void TransportSystem::InputCS()
     station.InputInfo();
     stations.insert({ station.GetID(), station });
 
-    int ID = station.GetID();
-    LogUserAction("Добавление кс", ID);
+    //int ID = station.GetID();
+    //LogUserAction("Добавление кс", ID);
 }
 
 //---------------View-------------------
@@ -90,7 +91,7 @@ void TransportSystem::View()
             "3. Список труб и КС" << endl;
 
 
-        switch (CorrectNumber(0, 3)) {
+        switch (CorrectNumber(cin, 0, 3)) {
         case 1: {
          
             cout << "Трубы: " << endl;
@@ -135,9 +136,6 @@ using Searching = vector<int>(*)(Struct& structure);
 template <typename Struct>
 vector<int> Search_By_Name(unordered_map<int, Struct>& structure)
 {
-    //cin.ignore(INT_MAX, '\n');
-    //getline(cin, name);
-    
     string name = input_string(cin);
 
 
@@ -148,14 +146,14 @@ vector<int> Search_By_Name(unordered_map<int, Struct>& structure)
 template <typename Struct>
 vector<int> Search_By_Status(unordered_map<int, Struct>& structure)
 {
-    vector<int> result = Find_By_Filter<Struct, bool>(structure, CheckByStatus, CorrectNumber(0, 1));
+    vector<int> result = Find_By_Filter<Struct, bool>(structure, CheckByStatus, CorrectNumber(cin, 0, 1));
     return result;
 }
 
 template <typename Struct>
 vector<int> Search_By_Workshop(unordered_map<int, Struct>& structure)
 {
-    vector<int> result = Find_By_Filter<Struct, int>(structure, CheckByWorkshop, CorrectNumber(0, 1));
+    vector<int> result = Find_By_Filter<Struct, int>(structure, CheckByWorkshop, CorrectNumber(cin, 0, 1));
     return result;
 }
 
@@ -166,7 +164,7 @@ void TransportSystem::Search()
         << "2. Поиск станций\n"
         << "0. Выход" << endl;
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -190,7 +188,7 @@ void TransportSystem::SearchPipes()
     cout << "Выберете фильтр поиска:" <<
         "\n1.По имени" <<
         "\n2.По состоянию" << endl;
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -229,7 +227,7 @@ void TransportSystem::SearchCS()
     cout << "Выберете фильтр поиска:" <<
         "\n1.По имени" <<
         "\n2.По состоянию" << endl;
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -273,7 +271,7 @@ void TransportSystem::Edit()
         << "2. Редактировать станции\n"
         << "0. Выход" << endl;
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -305,7 +303,7 @@ void TransportSystem::EditPipes()
         << "0. Выход" << endl;
 
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -335,7 +333,7 @@ void TransportSystem::EditCS() {
         << "2. Редактировать по фильтру\n"
         << "0. Выход" << endl;
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -362,7 +360,6 @@ void TransportSystem::EditOnePipe()
     ViewComponents(pipes);
     cout << "Выберете редактируемую трубу:";
 
-    //string action = "Редактировать трубу по выбору ";
     EditOne(pipes);
 
     
@@ -389,7 +386,7 @@ void TransportSystem::EditSomePipes()
         "\n1.По имени" <<
         "\n2.По состоянию" << endl;
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -399,12 +396,12 @@ void TransportSystem::EditSomePipes()
         {
             for (auto& id : result) pipes.at(id).PrintInfo();
             cout << "Изменить состояние труб?(0 - нет, 1 - да)" << endl;
-            int answer = CorrectNumber(0, 1);
+            int answer = CorrectNumber(cin, 0, 1);
             for (auto& id : result) {
                 pipes.at(id).Edit(answer);
 
-                int ID = id;
-                LogUserAction("Редактирование трубы по имени ", ID);
+                //int ID = id;
+                //LogUserAction("Редактирование трубы по имени ", ID);
             }
 
             
@@ -420,12 +417,12 @@ void TransportSystem::EditSomePipes()
         {
             for (auto& id : result) pipes.at(id).PrintInfo();
             cout << "Изменить состояние труб?(0 - нет, 1 - да)" << endl;
-            int answer = CorrectNumber(0, 1);
+            int answer = CorrectNumber(cin, 0, 1);
             for (auto& id : result) {
                 pipes.at(id).Edit(answer);
 
-                int ID = id;
-                LogUserAction("Редактирование трубы по состоянию ", ID);
+                //int ID = id;
+                //LogUserAction("Редактирование трубы по состоянию ", ID);
             }
         }
         else cout << "Нет подходящих труб";
@@ -449,7 +446,7 @@ void TransportSystem::EditSomeCS()
         "\n1.По имени" <<
         "\n2.По состоянию" << endl;
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -459,12 +456,12 @@ void TransportSystem::EditSomeCS()
         {
             for (auto& id : result) stations.at(id).PrintInfo();
             cout << "Изменить количество активных цехов на:(0 - 50)" << endl;
-            int answer = CorrectNumber(0, 50);
+            int answer = CorrectNumber(cin, 0, 50);
             for (auto& id : result) {
                 stations.at(id).Edit(answer);
 
-                int ID = id;
-                LogUserAction("Редактирование кс по имени ", ID);
+                //int ID = id;
+                //LogUserAction("Редактирование кс по имени ", ID);
             }
         }
         else cout << "Нет подходящих кс";
@@ -478,12 +475,12 @@ void TransportSystem::EditSomeCS()
         {
             for (auto& id : result) stations.at(id).PrintInfo();
             cout << "Изменить количество активных цехов на:(0 - 50)" << endl;
-            int answer = CorrectNumber(0, 50);
+            int answer = CorrectNumber(cin, 0, 50);
             for (auto& id : result) {
                 stations.at(id).Edit(answer);
 
-                int ID = id;
-                LogUserAction("Редактирование кс по состоянию ", ID);
+                //int ID = id;
+                //LogUserAction("Редактирование кс по состоянию ", ID);
             }
         }
         else cout << "Нет подходящих кс";
@@ -504,7 +501,7 @@ void TransportSystem::Delete()
         << "2. Удаление станций\n"
         << "0. Выход" << endl;
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -536,7 +533,7 @@ void TransportSystem::DeletePipes()
         << "0. Выход" << endl;
 
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -564,11 +561,11 @@ void TransportSystem::DeletePipes()
 
 void TransportSystem::DeletePipes(std::vector<int>& ids)
 {
-    int number = CorrectNumber<int>( 1, ids.size());
+    int number = CorrectNumber<int>(std::cin, 1, ids.size());
     pipes.erase(ids[number - 1]);
 
-    int ID = ids[number - 1];
-    LogUserAction("Удаление трубы", ID);
+    //int ID = ids[number - 1];
+    //LogUserAction("Удаление трубы", ID);
 }
 
 void TransportSystem::DeleteStations()
@@ -584,7 +581,7 @@ void TransportSystem::DeleteStations()
         << "0. Выход" << endl;
 
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -609,11 +606,11 @@ void TransportSystem::DeleteStations()
 
 void TransportSystem::DeleteStations(std::vector<int>& ids)
 {
-    int number = CorrectNumber<int>( 1, ids.size());
+    int number = CorrectNumber<int>(std::cin, 1, ids.size());
     stations.erase(ids[number - 1]);
 
-    int ID = ids[number - 1];
-    LogUserAction("Удаление кс", ID);
+    //int ID = ids[number - 1];
+    //LogUserAction("Удаление кс", ID);
 }
 
 void TransportSystem::DeleteSomePipes()
@@ -628,7 +625,7 @@ void TransportSystem::DeleteSomePipes()
         "\n1.По имени" <<
         "\n2.По состоянию" << endl;
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -638,12 +635,12 @@ void TransportSystem::DeleteSomePipes()
         {
             for (auto& id : result) pipes.at(id).PrintInfo();
             cout << "Удалить трубы?(0 - нет, 1 - да)" << endl;
-            if (CorrectNumber(0, 1))
+            if (CorrectNumber(cin, 0, 1))
             {
                 for (auto& id : result) {
                     pipes.erase(id);
-                    int ID = id;
-                    LogUserAction("Удаление трубы по имени", ID);
+                    //int ID = id;
+                    //LogUserAction("Удаление трубы по имени", ID);
                 }
             }
             else { return; }
@@ -659,12 +656,12 @@ void TransportSystem::DeleteSomePipes()
         {
             for (auto& id : result) pipes.at(id).PrintInfo();
             cout << "Удалить трубы?(0 - нет, 1 - да)" << endl;
-            if (CorrectNumber(0, 1))
+            if (CorrectNumber(cin, 0, 1))
             {
                 for (auto& id : result) {
                     pipes.erase(id);
-                    int ID = id;
-                    LogUserAction("Удаление трубы по состоянию", ID);
+                    //int ID = id;
+                    //LogUserAction("Удаление трубы по состоянию", ID);
                 }
             }
             else { return; }
@@ -690,7 +687,7 @@ void TransportSystem::DeleteSomeStations()
         "\n1.По имени" <<
         "\n2.По состоянию" << endl;
 
-    switch (CorrectNumber(0, 2))
+    switch (CorrectNumber(cin, 0, 2))
     {
     case 1:
     {
@@ -700,12 +697,12 @@ void TransportSystem::DeleteSomeStations()
         {
             for (auto& id : result) stations.at(id).PrintInfo();
             cout << "Удалить станции?(0 - нет, 1 - да)" << endl;
-            if (CorrectNumber(0, 1))
+            if (CorrectNumber(cin, 0, 1))
             {
                 for (auto& id : result) {
                     stations.erase(id);
-                    int ID = id;
-                    LogUserAction("Удаление кс по имени", ID);
+                    //int ID = id;
+                    //LogUserAction("Удаление кс по имени", ID);
                 }
             }
             else { return; }
@@ -722,12 +719,12 @@ void TransportSystem::DeleteSomeStations()
         {
             for (auto& id : result) stations.at(id).PrintInfo();
             cout << "Удалить станции?(0 - нет, 1 - да)" << endl;
-            if (CorrectNumber(0, 1))
+            if (CorrectNumber(cin, 0, 1))
             {
                 for (auto& id : result) {
                     stations.erase(id);
-                    int ID = id;
-                    LogUserAction("Удаление кс по состоянию", ID);
+                    //int ID = id;
+                    //LogUserAction("Удаление кс по состоянию", ID);
                 }
             }
             else { return; }
@@ -749,9 +746,7 @@ void TransportSystem::Save()
 {
     if (pipes.size() or stations.size()) {
         cout << "Введите название сохранения:" << endl;
-        string name;
-        cin.ignore(10000, '\n');
-        getline(cin, name);
+        string name = input_string(cin);
         name = "data/" + name + ".txt";
         
 
@@ -773,15 +768,15 @@ void TransportSystem::Save()
         file << pipes.size() << " " << stations.size() << " " << MaxId_Pipe << " " << MaxId_Station << endl;
         for (auto& pipe : pipes) {
             file << pipe.second;
-            int ID = pipe.second.ID;
-            LogUserAction("Сохранение трубы", ID);
+            //int ID = pipe.second.ID;
+            //LogUserAction("Сохранение трубы", ID);
         }
         
 
         for (auto& cs : stations) {
             file << cs.second;
-            int ID = cs.second.ID;
-            LogUserAction("Сохранение кс", ID);
+            //int ID = cs.second.ID;
+            //LogUserAction("Сохранение кс", ID);
         }
         file.close();
 
@@ -808,7 +803,7 @@ void TransportSystem::Load() {
 
  
     cout << "Выберете номер сохранения" << endl;
-    int save = CorrectNumber(1, count);
+    int save = CorrectNumber(cin, 1, count);
 
     count = 0;
     for (auto& name : filesystem::directory_iterator(path)) {
@@ -835,8 +830,8 @@ void TransportSystem::Load() {
             {
                 file >> pipe;
                 pipes.insert({ pipe.GetID(), pipe });
-                int ID = pipe.GetID();
-                LogUserAction("Загрузка трубы", ID);
+                //int ID = pipe.GetID();
+                //LogUserAction("Загрузка трубы", ID);
             }
 
 
@@ -844,8 +839,8 @@ void TransportSystem::Load() {
             {
                 file >> cs;
                 stations.insert({ cs.GetID(), cs });
-                int ID = cs.GetID();
-                LogUserAction("Загрузка кс", ID);
+                //int ID = cs.GetID();
+                //LogUserAction("Загрузка кс", ID);
             }
 
             cout << "Файлы загружены!\n" << endl;

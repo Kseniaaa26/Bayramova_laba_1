@@ -28,7 +28,7 @@ public:
 
     void Edit(int status);
 
-    void SetMaxId(int MaxId) { this->MaxId = MaxId; };//!!!!!!!!!!!!!
+    void SetMaxId(int MaxId) { this->MaxId = MaxId; };
     int GetMaxId() { return MaxId; };
 
     int GetID() { return ID; };

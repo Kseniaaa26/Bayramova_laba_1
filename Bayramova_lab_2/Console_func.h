@@ -15,7 +15,7 @@ public:
 
     TransportSystem();
     
-    void LogUserAction(const std::string& action, int ID);
+    //void LogUserAction(const std::string& action, int ID);
 
     void InputPipe();
     void InputCS();
@@ -66,7 +66,7 @@ public:
     void EditOne(std::unordered_map<int, Struct>& structure)
     {
         auto keys = GetKeys(structure);
-        int number = CorrectNumber<int>(1, keys.size()) - 1;
+        int number = CorrectNumber<int>(std::cin, 1, keys.size()) - 1;
         structure[keys[number]].Edit();
 
         

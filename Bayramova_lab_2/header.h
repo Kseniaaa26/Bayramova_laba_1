@@ -9,7 +9,27 @@
 
 #include <sstream>
 #include <filesystem>
+#include <format>
 
+template <typename Stream>
+class redirect_stream_wrapper
+{
+    Stream& stream;
+    std::streambuf* const old_buf;
+public:
+    redirect_stream_wrapper(Stream& src)
+        :old_buf(src.rdbuf()), stream(src)
+    {
+    }
+
+    ~redirect_stream_wrapper() {
+        stream.rdbuf(old_buf);
+    }
+    void redirect(Stream& dest)
+    {
+        stream.rdbuf(dest.rdbuf());
+    }
+};
 
 inline std::string input_string(std::istream& in)
 {
@@ -22,19 +42,21 @@ inline std::string input_string(std::istream& in)
 }
 
 template <typename T>
-T CorrectNumber(T min, T max)
+T CorrectNumber(std::istream& in, T min, T max)
 {
     T x;
-    while ((std::cin >> x).fail()
-        || std::cin.peek() != '\n'
+    while ((in >> x).fail()
+        || in.peek() != '\n'
         || x < min || x > max)
     {
-        std::cin.clear();
-        std::cin.ignore(10000, '\n');
+        in.clear();
+        in.ignore(10000, '\n');
         std::cout << "\nНеверный ввод данных!" << std::endl;
         std::cout << "Введите число от " << min << " до " << max << std::endl;
     }
     
+    std::cerr << x << std::endl;
+
     return x;
 }
 
@@ -51,4 +73,3 @@ std::vector<int> GetKeys(const std::unordered_map<int, T>& container)
         keys.push_back(id);
     return keys;
 }
-

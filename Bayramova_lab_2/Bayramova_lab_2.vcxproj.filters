@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Bayramova_lab_2.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="Pipe.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>

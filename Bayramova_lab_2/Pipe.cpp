@@ -2,8 +2,6 @@
 
 using namespace std;
 
-//int Pipe::MaxId = 0;
-
 Pipe::Pipe() {
     name = "Non";
     length = 0.0;
@@ -22,17 +20,16 @@ Pipe::Pipe(string name, float length, int diameter, bool in_repairing) {
 void Pipe::InputInfo() {
     
     cout << "¬ведите название трубы: ";
-    cin.ignore(INT_MAX, '\n');
-    getline(cin, name);
+    name = input_string(cin);
 
     cout << "¬ведите длину трубы: ";
-    length = CorrectNumber(0.0, 10000.);
+    length = CorrectNumber(cin, 0.0, 10000.);
 
     cout << "¬ведите диаметр трубы: ";
-    diameter = CorrectNumber(0, INT_MAX);
+    diameter = CorrectNumber(cin, 0, INT_MAX);
 
     cout << "¬ведите состо€ние трубы(0 - в ремонте, 1 - в работе): " << endl;
-    in_repairing = CorrectNumber(0, 1);
+    in_repairing = CorrectNumber(cin, 0, 1);
     
 }
 
@@ -54,7 +51,7 @@ void Pipe::Edit()
 {
     PrintInfo();
     cout << "»зменить признак в ремонте(0 - оставить, 1 - изменить):" << endl;
-    Edit(CorrectNumber(0, 1));
+    Edit(CorrectNumber(cin, 0, 1));
     
 }
 
@@ -71,7 +68,8 @@ ofstream& operator << (ofstream& file, const Pipe& pipe) {
 
 ifstream& operator >> (ifstream& file, Pipe& pipe) {
     if (file.is_open()) {
-        file >> pipe.name;
+        file >> ws;
+        getline(file, pipe.name);
         file >> pipe.length;
         file >> pipe.diameter;
         file >> pipe.in_repairing;
