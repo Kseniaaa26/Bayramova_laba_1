@@ -1,75 +1,56 @@
 #pragma once
-
-#include <iostream> 
-#include <fstream> 
-#include <string> 
+#include <iostream>
+#include <fstream>
+#include <string>
 #include <vector>
+#include <float.h>
 #include <unordered_map>
-#include <map>
-
-#include <sstream>
-#include <filesystem>
-#include <format>
-
-template <typename Stream>
-class redirect_stream_wrapper
-{
-    Stream& stream;
-    std::streambuf* const old_buf;
-public:
-    redirect_stream_wrapper(Stream& src)
-        :old_buf(src.rdbuf()), stream(src)
-    {
-    }
-
-    ~redirect_stream_wrapper() {
-        stream.rdbuf(old_buf);
-    }
-    void redirect(Stream& dest)
-    {
-        stream.rdbuf(dest.rdbuf());
-    }
-};
-
-inline std::string input_string(std::istream& in)
-{
-    in.ignore(1000000, '\n');
-    in >> std::ws;
-    std::string str;
-    std::getline(std::cin, str);
-    std::cerr << str << std::endl;
-    return str;
-}
-
+#include <unordered_set>
+#include "Pipe.h"
+#include "CS.h"
+#include "Graph.h"
+using namespace std;
 template <typename T>
-T CorrectNumber(std::istream& in, T min, T max)
-{
+T correctnumber(T min, T max) {
     T x;
-    while ((in >> x).fail()
-        || in.peek() != '\n'
-        || x < min || x > max)
-    {
-        in.clear();
-        in.ignore(10000, '\n');
-        std::cout << "\nНеверный ввод данных!" << std::endl;
-        std::cout << "Введите число от " << min << " до " << max << std::endl;
+    while (((cin >> x).fail()) || (cin.peek() != '\n') || (x < min) || (x > max)) {
+        cout << "\nНеверный ввод данных!" << endl;
+        cout << "Введите число от " << min << " до " << max << endl;
+        cin.clear();
+        cin.ignore(INT_MAX, '\n');
     }
-    
-    std::cerr << x << std::endl;
-
     return x;
 }
 
 
-
-
 template <typename T>
-std::vector<int> GetKeys(const std::unordered_map<int, T>& container)
-{
-    std::vector<int> keys;
-    keys.reserve(container.size());
-    int i = 0;
-    for (auto& [id, element] : container)
-        keys.push_back(id);
-    return keys;
+ostream& operator<< (ostream& out, unordered_map <int, T>& p) {
+    out << "ID выхода: ";
+    for (auto& [i, obj] : p) {
+        out << i << " ";
+    }
+    out << endl;
+    return out;
+}
+template <typename T>
+using filter_p = bool (*) (Pipe p, T par);
+template <typename T>
+using filter_cs = bool(*) (CS cs, T par);
+template <typename T>
+vector <int> search_p_by_parametr(unordered_map <int, Pipe>& pipe_group, filter_p<T> f, T par) {
+    vector <int> id;
+    for (auto& pipe : pipe_group) {
+        if (f(pipe.second, par))
+            id.push_back(pipe.second.get_id());
+    }
+    return id;
+}
+template <typename T>
+vector <int> search_cs_by_parametr(unordered_map <int, CS>& cs_group, filter_cs<T> f, T par) {
+    vector <int> id;
+    for (auto& cs : cs_group) {
+        if (f(cs.second, par))
+            id.push_back(cs.second.get_id());
+    }
+    return id;
 }
