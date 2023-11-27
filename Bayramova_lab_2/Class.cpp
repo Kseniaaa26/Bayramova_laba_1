@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <unordered_set>
 using namespace std;
+
 bool System::check_only(int x, int y) {
     int k = 0;
     for (auto& i : graphs) {
