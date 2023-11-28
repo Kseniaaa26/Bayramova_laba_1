@@ -3,13 +3,40 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <float.h>
 #include <unordered_map>
 #include <unordered_set>
 #include "Pipe.h"
 #include "CS.h"
 #include "Graph.h"
+#include <format>
+#include <chrono>
+#include <sstream>
+
 using namespace std;
+
+#define INPUT_LINE(in, str) getline(in>>ws, str); \
+						cerr << str << endl
+
+class redirect_output_wrapper
+{
+    std::ostream& stream;
+    std::streambuf* const old_buf;
+public:
+    redirect_output_wrapper(std::ostream& src)
+        :old_buf(src.rdbuf()), stream(src)
+    {
+    }
+
+    ~redirect_output_wrapper() {
+        stream.rdbuf(old_buf);
+    }
+    void redirect(std::ostream& dest)
+    {
+        stream.rdbuf(dest.rdbuf());
+    }
+};
+
+
 template <typename T>
 T correctnumber(T min, T max) {
     T x;
@@ -19,13 +46,26 @@ T correctnumber(T min, T max) {
         cin.clear();
         cin.ignore(INT_MAX, '\n');
     }
+    cerr << x << endl;
+    return x;
+}
+
+template <typename T>
+T correctdiametr() {
+    T x;
+    while (((cin >> x).fail()) || (cin.peek() != '\n') || ((x != 500) && (x != 700) && (x != 1000) && (x != 1400))) {
+        cout << "\nНеверный ввод данных!" << endl;
+        cout << "Введите число из списка: (500, 700, 1000, 1400) " << endl;
+        cin.clear();
+        cin.ignore(INT_MAX, '\n');
+    }
     return x;
 }
 
 
 template <typename T>
 ostream& operator<< (ostream& out, unordered_map <int, T>& p) {
-    out << "ID выхода: ";
+    out << "ID: ";
     for (auto& [i, obj] : p) {
         out << i << " ";
     }
@@ -54,3 +94,5 @@ vector <int> search_cs_by_parametr(unordered_map <int, CS>& cs_group, filter_cs<
     }
     return id;
 }
+
+;

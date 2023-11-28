@@ -3,7 +3,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <float.h>
 #include <unordered_map>
 #include <unordered_set>
 using namespace std;
@@ -23,7 +22,7 @@ public:
     void save_pipe(ofstream& file);
     void load_pipe(ifstream& file);
 
-    static int GetMaxId() { return max_id; };
+    
     int get_id() { return idp; }
     double get_dia() { return diameter; }
 

@@ -1,18 +1,25 @@
-﻿#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <float.h>
-#include <unordered_map>
-#include <unordered_set>
-#include "CS.h"
+﻿#include "CS.h"
 #include "Pipe.h"
 #include "header.h"
 #include "Graph.h"
+#include <format>
+#include <chrono>
+#include <sstream>
+
 using namespace std;
+using namespace chrono;
 int main()
 {
     setlocale(LC_ALL, "ru");
+
+   
+
+    redirect_output_wrapper cerr_out(cerr);
+    string time = format("{:%d_%m_%Y_%H_%M_%OS}", system_clock::now() + hours(3));
+    ofstream logfile("Logs/log_" + time + ".txt");
+    if (logfile)
+        cerr_out.redirect(logfile);
+
     System network;
     int option = -1;
     while (option) {
@@ -27,7 +34,8 @@ int main()
             "9. Найти КС\n" <<
             "10. Создать газотранспортную сеть\n" <<
             "11. Сортировка\n" <<
-            "0. Выход\n" << endl;
+            "0. Выход\n" << 
+            "Введите ваш выбор: ";
 
         switch (correctnumber(0, 11)) {
         case 1: {
@@ -77,7 +85,6 @@ int main()
             break;
         }
         case 9: {
-
             if (network.cs_group.size() != 0) {
                 auto x = network.search_cs();
                 if (x.size() != 0) {

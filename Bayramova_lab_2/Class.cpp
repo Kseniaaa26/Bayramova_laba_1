@@ -2,13 +2,7 @@
 #include "Pipe.h"
 #include "CS.h"
 #include "header.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <float.h>
-#include <unordered_map>
-#include <unordered_set>
+
 using namespace std;
 
 bool System::check_only(int x, int y) {
@@ -134,26 +128,34 @@ void System::Graph::load_edge(ifstream& file) {
     file >> id_pipe;
 }
 void System::save() {
-    string x;
-    cout << "Введите название файла " << endl;
-    cin >> x;
-    ofstream file;
-    file.open(x + ".txt");
-    if (!file)
-        cout << "Ошибка" << endl;
-    else {
-        file << pipe_group.size() << " " << cs_group.size() << " " << graphs.size() << endl;
-        for (auto pipe : pipe_group) {
-            pipe.second.save_pipe(file);
+    if (pipe_group.size() or cs_group.size()) {
+        string x;
+        cout << "Введите название файла " << endl;
+        cin >> x;
+        ofstream file;
+        file.open("data/" + x + ".txt");
+        if (!file)
+            cout << "Ошибка" << endl;
+        else {
+            file << pipe_group.size() << " " << cs_group.size() << " " << graphs.size() << endl;
+            for (auto pipe : pipe_group) {
+                pipe.second.save_pipe(file);
+            }
+            for (auto cs : cs_group)
+                cs.second.save_cs(file);
+            for (auto edge : graphs)
+                edge.second.save_edge(file);
         }
-        for (auto cs : cs_group)
-            cs.second.save_cs(file);
-        for (auto edge : graphs)
-            edge.second.save_edge(file);
     }
-
 }
 void System::load() {
+    if (pipe_group.size() and cs_group.size()) {
+        cout << "После загрузки все введенные данные удалятся. Хотите ли вы их сохранить? (да-1, нет -0) " << endl;
+        if (correctnumber(0, 1)) {
+            save();
+        }
+
+    }
     string x;
     int len1, len2, len3;
     Pipe newP;
@@ -162,7 +164,7 @@ void System::load() {
     cout << "Введите название файла  " << endl;
     cin >> x;
     ifstream file;
-    file.open(x + ".txt");
+    file.open("data\\" + x + ".txt");
     if (!file)
         cout << "Нет таких файлов";
     else {
@@ -254,7 +256,7 @@ void System::editcs() {
             }
         }
         if (edit == 3) {
-            cout << "1. ID одной КС, которую вы хотите удалить\n " 
+            cout << "1. Введите ID одной КС, которую вы хотите удалить\n " 
                 << "2. Удалить несколько КС\n " << endl;
             int d;
             d = correctnumber(1, 2);
@@ -384,8 +386,8 @@ void System::edit()
             }
         }
         if (edit == 3) {
-            cout << "1. ID одной трубы, которую вы хотите удалить \n" 
-                << "1. Удалить несколько труб \n" << endl;
+            cout << "1. Введите ID одной трубы, которую вы хотите удалить \n" 
+                << "2. Удалить несколько труб \n" << endl;
             int d;
             d = correctnumber(1, 2);
             if (d == 1) {
@@ -510,6 +512,9 @@ void System::sorted() {
         cout << vertexes.back() << " ";
         vertexes.pop_back();
     }
+    if (vertexes.empty()) {
+        cout << "В графе имеется Цикл";
+    }
     cout << endl;
 }
 void System::sorting() {
@@ -518,7 +523,7 @@ void System::sorting() {
     sorted();
 }
 ostream& operator<<(ostream& out, unordered_set<int> s) {
-    cout << "Незадеййствованные оьъекты: ";
+    cout << "Незадействованные оьъекты: ";
     for (auto& i : s)
         cout << i << " ";
     cout << endl;
@@ -541,8 +546,8 @@ istream& operator>> (istream& in, System& s) {
     gr.id_exit = s.check_existing(gr.id_exit);
     gr.id_exit = s.check_graph(gr.id_exit);
     if (s.check_only(gr.id_entrance, gr.id_exit)) {
-        cout << "Выберете диаметр трубы для соединения: 500, 600 или 1400" << endl;
-        double dia_pipe = correctnumber(500.0, 1400.0);
+        cout << "Выберете диаметр трубы для соединения: 500, 700, 1000 или 1400" << endl;
+        double dia_pipe = correctdiametr<int>();
         int k = s.edge(dia_pipe);
         while (s.pipe_group.find(k) == s.pipe_group.end()) {
             cout << "Нет таких труб, введите заново(1) или создайте новую трубу(2)" << endl;
@@ -552,8 +557,8 @@ istream& operator>> (istream& in, System& s) {
                 cin >> p;
                 s.pipe_group.insert({ p.get_id(), p });
             }
-            cout << "Выберете диаметр трубы для соединения: 500, 600 or 1400" << endl;
-            dia_pipe = correctnumber(0.0, DBL_MAX);
+            cout << "Выберете диаметр трубы для соединения: 500, 700, 1000 или 1400" << endl;
+            dia_pipe = correctdiametr<int>();
             k = s.edge(dia_pipe);
         }
         gr.id_pipe = k;
