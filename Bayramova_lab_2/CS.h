@@ -28,5 +28,5 @@ public:
 private:
     int  workshop, working_workshop, idcs;
     double effectiveness;
-    //static int max_idd;
+    
 };

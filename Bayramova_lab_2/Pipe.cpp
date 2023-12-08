@@ -34,6 +34,20 @@ ostream& operator<< (ostream& out, Pipe& p) {
 
     return out;
 }
+
+double System::getPipeLength(int pipeId) const
+{
+    auto it = pipe_group.find(pipeId);
+
+    if (it != pipe_group.end())
+    {
+        return it->second.getPipeLength();
+    }
+    else
+    {
+        return 0.0; 
+    }
+}
 void Pipe::edit_Pipe() {
     cout << "Состояние трубы: " << status_check(status) << endl;
     cout << "Изменить состояние трубы (0 - в ремонте, 1 - в работе)" << endl;

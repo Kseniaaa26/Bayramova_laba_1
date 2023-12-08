@@ -12,7 +12,7 @@ int main()
 {
     setlocale(LC_ALL, "ru");
 
-   
+
 
     redirect_output_wrapper cerr_out(cerr);
     string time = format("{:%d_%m_%Y_%H_%M_%OS}", system_clock::now() + hours(3));
@@ -34,10 +34,11 @@ int main()
             "9. Найти КС\n" <<
             "10. Создать газотранспортную сеть\n" <<
             "11. Сортировка\n" <<
-            "0. Выход\n" << 
+            "12. Расчет кратчайшего пути между заданными КС\n" <<
+            "0. Выход\n" <<
             "Введите ваш выбор: ";
 
-        switch (correctnumber(0, 11)) {
+        switch (correctnumber(0, 12)) {
         case 1: {
             Pipe p;
             cin >> p;
@@ -142,11 +143,17 @@ int main()
             network.sorting();
             break;
         }
-        case 0: {
-            return 0;
+
+        case 12: {
+            network.adjacencytable(network.graphs); // Populate the adjacency table
+            int start, end;
+            cout << "Введите начальную КС: ";
+            start = correctnumber(0, INT_MAX);
+            cout << "Введите конечную КС: ";
+            end = correctnumber(0, INT_MAX);
+            network.findShortestPath(start, end);
+            break;
         }
         }
     }
-
-    return 0;
 }

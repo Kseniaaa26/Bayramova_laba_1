@@ -2,6 +2,8 @@
 #include "Pipe.h"
 #include "CS.h"
 #include "header.h"
+#include <queue>
+#include <stack>
 
 using namespace std;
 
@@ -52,6 +54,7 @@ int System::check_existing(int x) {
     }
     return x;
 }
+
 bool check_p_name(Pipe p, string name) {
     return (p.name.find(name) != string::npos);
 }
@@ -522,6 +525,8 @@ void System::sorting() {
     adjacencytable(graphs);
     sorted();
 }
+
+
 ostream& operator<<(ostream& out, unordered_set<int> s) {
     cout << "Незадействованные оьъекты: ";
     for (auto& i : s)
@@ -571,3 +576,48 @@ istream& operator>> (istream& in, System& s) {
     return in;
 
 }
+
+
+
+void System::findShortestPath(int start, int end) {
+    System::Graph gr;
+    // Create a priority queue to store vertices and their distances
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+
+    // Create a vector to store distances from the start vertex to all other vertices
+    vector<int> dist(cs_group.size() + pipe_group.size(), INT_MAX);
+
+    // Mark the start vertex as visited and initialize its distance as 0
+    dist[start] = 0;
+
+    // Insert the start vertex into the priority queue
+    pq.push({ 0, start });
+
+    // Process vertices and edges in the priority queue
+    while (!pq.empty()) {
+        int u = pq.top().second;  // Get the vertex with the smallest distance
+        pq.pop();
+
+        // Iterate over the adjacent vertices of the current vertex
+        for (const auto& edge : table[u]) {
+            int v = edge.id_exit;
+            int weight = getPipeLength(edge.id_pipe);  // Get the length of the pipe as the weight
+
+            // If the new distance is smaller than the current distance, update it
+            if (dist[v] > dist[u] + weight) {
+                dist[v] = dist[u] + weight;
+                pq.push({ dist[v], v });
+            }
+        }
+    }
+
+    // Output the shortest path distance from the start vertex to the end vertex
+    cout << dist[end] << endl;
+    if (dist[end] == INT_MAX) {
+        cout << "Нет пути из " << start << " в " << end << endl;
+    }
+    else {
+        cout << "Кратчайший путь из " << start << " в " << end << ": " << dist[end] << endl;
+    }
+}
+

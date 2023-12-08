@@ -8,6 +8,9 @@
 #include <unordered_set>
 #include "Pipe.h"
 #include "CS.h"
+#include <queue>
+#include <stack>
+#include <set>
 using namespace std;
 class System
 {
@@ -27,7 +30,14 @@ public:
 		int id_pipe;
 		void save_edge(ofstream& file);
 		void load_edge(ifstream& file);
+
+		double length;
+        
 	};
+
+    void findShortestPath(int start, int end);
+    double getPipeLength(int pipeId) const;
+
 	void adjacencytable(unordered_map<int, System::Graph>&);
 	unordered_map <int, vector <Graph>> table;
 	friend istream& operator>> (istream& in, System& s);
@@ -36,6 +46,8 @@ public:
 	void topsort(int x, unordered_map<int, int>& visited, vector<int>& vertexes);
 	void sorting();
 	void sorted();
+	
+
 	int check_pipe(int x);
 	bool checking(int x);
 	int edge(int x);
@@ -43,4 +55,5 @@ public:
 	int check_existing(int x);
 	bool check_only(int x, int y);
 	bool check_obj(int x);
+
 };

@@ -25,6 +25,7 @@ public:
     
     int get_id() { return idp; }
     double get_dia() { return diameter; }
+    double getPipeLength() const {return length;}
 
 private:
     double length = 0, diameter = 0;
