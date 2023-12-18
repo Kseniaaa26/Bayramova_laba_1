@@ -1,32 +1,34 @@
-#pragma once
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
-#include <float.h>
-#include <unordered_set>
+#include <unordered_map>
+
 using namespace std;
-class CS
-{
-public: 
-      static int max_idd;
-      CS() {
-          idcs = max_idd++;
-      }
-      friend istream& operator>> (istream& in, CS& p);
-      friend ostream& operator<< (ostream& out, CS& cs);
-      void save_cs(ofstream& file);
-      void edit_cs();
-      void load_cs(ifstream& file);
-      int get_id() { return idcs; }
-      double get_unused() { return (((double)workshop - (double)working_workshop) / (double)workshop) * 100; }
-      string name = "";
-      int getwork() { return workshop; };
-      static int GetMaxId() { return max_idd; };
 
-
+class KC {
 private:
-    int  workshop, working_workshop, idcs;
-    double effectiveness;
-    
+    int id;
+    static int MaxID;
+    /*основные параметры станции*/
+    string name;
+    int kolich_ceh;
+    int kolich_ceh_v_rabote;
+    double effectivnost;
+
+public:
+
+    int getID() const;
+    string getname() const;
+    bool geteffectivnost() const;
+    int get_kcehov() const;
+    void set_wcehov(int w);
+    /*основные действия над станциями*/
+    void add_new_kc();
+    double getLoad() const;
+
+    friend class PipeAndKC;
+
+    friend std::ofstream& operator << (std::ofstream& fout, const KC& kc);
+    friend std::ostream& operator << (std::ostream& out, const KC& kc);
+    friend std::ifstream& operator >> (std::ifstream& fin, KC& kc);
 };

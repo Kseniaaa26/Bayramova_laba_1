@@ -136,6 +136,7 @@
     <ClCompile Include="Pipe.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Class.h" />
     <ClInclude Include="Console_func.h" />
     <ClInclude Include="CS.h" />
     <ClInclude Include="Graph.h" />

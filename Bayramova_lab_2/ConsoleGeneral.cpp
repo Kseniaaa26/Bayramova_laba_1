@@ -1,159 +1,440 @@
-﻿#include "CS.h"
-#include "Pipe.h"
+﻿#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <unordered_set>
 #include "header.h"
-#include "Graph.h"
-#include <format>
+
+#include <unordered_map>
 #include <chrono>
-#include <sstream>
+#include <format>
+#include "Class.h"
 
 using namespace std;
 using namespace chrono;
-int main()
+
+
+template<typename T>
+using Filter = bool(*)(const Pipe& p, T parametr);
+
+bool CheckByName(const Pipe& p, string parametr)
 {
-    setlocale(LC_ALL, "ru");
+    return p.getKmname().find(parametr) != std::string::npos;
+}
+bool CheckByRepair(const Pipe& p, bool parametr)
+{
+    return p.getRepair() == parametr;
+}
 
-
-
-    redirect_output_wrapper cerr_out(cerr);
-    string time = format("{:%d_%m_%Y_%H_%M_%OS}", system_clock::now() + hours(3));
-    ofstream logfile("Logs/log_" + time + ".txt");
-    if (logfile)
-        cerr_out.redirect(logfile);
-
-    System network;
-    int option = -1;
-    while (option) {
-        cout << "\n1. Добавить трубу\n" <<
-            "2. Добавить КС\n" <<
-            "3. Просмотр всех объектов\n" <<
-            "4. Редактировать трубу\n" <<
-            "5. Редактировать КС\n" <<
-            "6. Сохранить\n" <<
-            "7. Загрузить\n" <<
-            "8. Найти трубу\n" <<
-            "9. Найти КС\n" <<
-            "10. Создать газотранспортную сеть\n" <<
-            "11. Сортировка\n" <<
-            "12. Расчет кратчайшего пути между заданными КС\n" <<
-            "0. Выход\n" <<
-            "Введите ваш выбор: ";
-
-        switch (correctnumber(0, 12)) {
-        case 1: {
-            Pipe p;
-            cin >> p;
-            network.pipe_group.insert({ p.get_id(), p });
-            break;
-        }
-        case 2: {
-            CS cs;
-            cin >> cs;
-            network.cs_group.insert({ cs.get_id(), cs });
-            break;
-        }
-        case 3: {
-            network.information();
-            break;
-        }
-        case 4: {
-            network.edit();
-            break;
-        }
-        case 5: {
-            network.editcs();
-            break;
-        }
-        case 6: {
-            network.save();
-            break;
-        }
-        case 7: {
-            network.load();
-            break;
-        }
-        case 8: {
-            if (network.pipe_group.size() != 0) {
-                auto x = network.search_p();
-                if (x.size() != 0) {
-                    for (auto& i : x)
-                        cout << network.pipe_group[i] << endl;
-                }
-                else
-                    cout << "Нет такой трубы" << endl;
-            }
-            else
-                cout << "Труба не найдена" << endl;
-            break;
-        }
-        case 9: {
-            if (network.cs_group.size() != 0) {
-                auto x = network.search_cs();
-                if (x.size() != 0) {
-                    for (auto& i : x)
-                        cout << network.cs_group[i] << endl;
-                }
-                else
-                    cout << "Нет такой КС";
-            }
-            else
-                cout << "КС не найдена" << endl;
-            break;
-        }
-        case 10: {
-            cout << "1.Соеднить 2.Разъединить" << endl;
-            int choise = correctnumber(1, 2);
-            if (choise == 1) {
-                if ((network.cs_group.size() < 2) or (network.pipe_group.size() < 1))
-                    cout << "Недостаточно объектов, чтобы создать сеть" << endl;
-                else
-                    cin >> network;
-            }
-            else {
-                if (network.graphs.size() != 0) {
-                    cout << "Введите КС входа" << endl;
-                    int x = correctnumber(0, INT_MAX);
-                    x = network.check_existing(x);
-                    cout << "Введите КС выхода" << endl;
-                    int y = correctnumber(0, INT_MAX);
-                    y = network.check_existing(y);
-                    while (x == y) {
-                        cout << "Вы не можете разъединить одну и ту же КС" << endl;
-                        y = correctnumber(0, INT_MAX);
-                        y = network.check_existing(y);
-                    }
-                    auto i = network.graphs.cbegin();
-                    while (i != network.graphs.cend()) {
-                        if (((*i).second.id_entrance == x) and ((*i).second.id_exit == y)) {
-                            network.graphs.erase(i);
-                            break;
-                        }
-                        i++;
-                    }
-                }
-
-                else
-                    cout << "Нет доступных сетей" << endl;
-
-            }
-            for (auto& [i, j] : network.graphs)
-                cout << i << ") " << j.id_entrance << " " << j.id_exit << " " << j.id_pipe << endl;
-            break;
-        }
-        case 11: {
-            network.sorting();
-            break;
-        }
-
-        case 12: {
-            network.adjacencytable(network.graphs); // Populate the adjacency table
-            int start, end;
-            cout << "Введите начальную КС: ";
-            start = correctnumber(0, INT_MAX);
-            cout << "Введите конечную КС: ";
-            end = correctnumber(0, INT_MAX);
-            network.findShortestPath(start, end);
-            break;
-        }
+template<typename T>
+unordered_set <int> FindPipesByFilter(const unordered_map<int, Pipe>& pmap, Filter<T> f, T parametr)
+{
+    unordered_set <int> result;
+    for (const auto& [id, p] : pmap) {
+        if (f(p, parametr)) {
+            result.insert(id);
         }
     }
+    return result;
+}
+
+
+template<typename T>
+using Filter1 = bool(*)(const KC& kc, T parametr);
+
+bool CheckByName(const KC& kc, string parametr)
+{
+    return kc.getname().find(parametr) != std::string::npos;
+}
+bool CheckByLoad(const KC& kc, int parametr)
+{
+    return (100 - int(kc.getLoad())) == parametr;
+}
+
+template<typename T>
+unordered_set <int> FindKCsByFilter(const unordered_map<int, KC>& kcmap, Filter1<T> f, T parametr)
+{
+    unordered_set <int> result;
+    for (const auto& [id, kc] : kcmap) {
+        if (f(kc, parametr)) {
+            result.insert(id);
+        }
+    }
+    return result;
+}
+
+
+void text_menu() {
+    cout << "menu\n";
+    cout << " 1. add pipe\n";
+    cout << " 2. add kc\n";
+    cout << " 3. Viewing available objects\n";
+    cout << " 4. edit pipe\n";
+    cout << " 5. edit kc\n";
+    cout << " 6. save\n";
+    cout << " 7. to load\n";
+    cout << " 8. create a rebra\n";
+    cout << " 9. see rebra\n";
+    cout << "10. delete rebra\n";
+    cout << "11. make topological sort\n";
+    cout << "12. min rasstoyanie between two vershins\n";
+    cout << "13. max potok\n";
+    cout << "14. exit\n";
+    cout << endl;
+}
+
+void choiceEdit(unordered_map<int, Pipe>& pmap, const unordered_set <int>& f) {
+    int sk = f.size();
+    if (sk) {
+        unordered_set <int> yourchoice;
+        cout << "choice id for edit, '0' if you want end input:";
+        int ssze = get_correct(1000, 0);
+
+        while (ssze) {
+            if (f.count(ssze)) {
+                yourchoice.insert(ssze);
+            }
+            ssze = get_correct(1000, 0);
+        }
+        for (auto& [id, p] : pmap) {
+            if (yourchoice.count(id)) {
+                p.editpipe();
+            }
+        }
+    }
+    else
+        return;
+}
+
+
+void editAllpipe(unordered_map <int, Pipe>& pmap) {
+    for (auto& [id, p] : pmap) {
+        p.editpipe();
+    }
+}
+
+void editPipe_byname(unordered_map <int, Pipe>& pmap) {
+    cout << "input: ";
+    string s;
+    INPUT_LINE(cin, s);
+    for (int t : FindPipesByFilter(pmap, CheckByName, s)) {
+        cout << "id: " << t << endl;
+    }
+    choiceEdit(pmap, FindPipesByFilter(pmap, CheckByName, s));
+}
+
+void editPipe_byrepair(unordered_map <int, Pipe>& pmap) {
+    cout << "repair(0 - no or 1 - yes): ";
+    bool b;
+    b = get_correct(1, 0);
+    for (int t : FindPipesByFilter(pmap, CheckByRepair, b)) {
+        cout << "id: " << t << endl;
+    }
+    choiceEdit(pmap, FindPipesByFilter(pmap, CheckByRepair, b));
+}
+
+void editPipeINcase4(unordered_map <int, Pipe>& pmap) {
+    cout << "Edit all pipes-0 or by filter name-1 or by filter repair-2: ";
+    int j;
+    j = get_correct(2, 0);
+    if (j == 2) {
+        editPipe_byrepair(pmap);
+    }
+    else if (j == 1) {
+        editPipe_byname(pmap);
+    }
+    else {
+        editAllpipe(pmap);
+    }
+}
+
+void choiceDel(unordered_map<int, Pipe>& pmap, const unordered_set <int>& f, unordered_map<int, PipeAndKC::svyaz>& rebra) {
+    int sk = f.size();
+    if (sk) {
+        unordered_set <int> yourchoice;
+        cout << "choice id for delete:";
+        int ssze = get_correct(1000, 0);
+        while (ssze) {
+            if (f.count(ssze)) {
+                yourchoice.insert(ssze);
+            }
+            ssze = get_correct(1000, 0);
+        }
+        for (int x : yourchoice) {
+            pmap.erase(x);
+            rebra.erase(x);
+        }
+    }
+    else
+        return;
+}
+
+bool wantdelete() {
+    cout << "realno want delete?(y/n):";
+    string s;
+    INPUT_LINE(cin, s);
+    if (s == "n")
+        return true;
+    return false;
+}
+
+void delallPipe(unordered_map <int, Pipe>& pmap, unordered_map<int, PipeAndKC::svyaz>& rebra) {
+    if (wantdelete()) {
+        return;
+    }
+    rebra.clear();
+    pmap.clear();
+}
+
+void delPipe_byname(unordered_map <int, Pipe>& pmap, unordered_map<int, PipeAndKC::svyaz>& rebra) {
+    if (wantdelete()) {
+        return;
+    }
+    cout << "name: ";
+    string s;
+    INPUT_LINE(cin, s);
+    for (int t : FindPipesByFilter(pmap, CheckByName, s)) {
+        cout << "id: " << t << endl;
+    }
+    choiceDel(pmap, FindPipesByFilter(pmap, CheckByName, s), rebra);
+}
+
+void delPipeINcase4(unordered_map <int, Pipe>& pmap, unordered_map<int, PipeAndKC::svyaz>& rebra) {
+    cout << "Delete all pipes-0 or by filter name-1: ";
+    int l;
+    l = get_correct(1, 0);
+    if (l == 1) {
+        delPipe_byname(pmap, rebra);
+    }
+    else {
+        delallPipe(pmap, rebra);
+    }
+}
+
+void out_pmap(unordered_map <int, Pipe>& pmap) {
+    for (const auto& [id, p] : pmap) {
+        cout << "id: " << id << "\t" << p;
+    }
+}
+
+
+void out_kcmap(unordered_map <int, KC>& kcmap) {
+    for (const auto& [id, kc] : kcmap) {
+        cout << "id: " << id << "\t" << kc;
+    }
+}
+
+void choiceEdit(unordered_map<int, KC>& kcmap, const unordered_set <int>& f) {
+    int sk = f.size();
+    if (sk) {
+        unordered_set <int> yourchoice;
+        cout << "choice id for edit:\n";
+        int ssze = get_correct(1000, 0);
+        while (ssze) {
+            if (f.count(ssze)) {
+                yourchoice.insert(ssze);
+            }
+            ssze = get_correct(1000, 0);
+        }
+        int wceh;
+        for (auto& [id, kc] : kcmap) {
+            if (yourchoice.count(id)) {
+                cout << "wceh: ";
+                wceh = get_correct(kc.get_kcehov(), 0);
+                kc.set_wcehov(wceh);
+            }
+        }
+    }
+    else
+        return;
+}
+
+void editKC_byname(unordered_map <int, KC>& kcmap) {
+    cout << "name: ";
+    string s;
+    INPUT_LINE(cin, s);
+    for (int t : FindKCsByFilter(kcmap, CheckByName, s)) {
+        cout << "id: " << t << endl;
+    }
+    choiceEdit(kcmap, FindKCsByFilter(kcmap, CheckByName, s));
+}
+
+void delsvyazkc(unordered_map<int, PipeAndKC::svyaz>& rebra, int& x) {
+    for (auto& [id, r] : rebra) {
+        if (r.vhod == x || r.vihod == x) {
+            rebra.erase(id);
+        }
+    }
+}
+
+void choiceDel(unordered_map<int, KC>& kcmap, const unordered_set <int>& f, unordered_map<int, PipeAndKC::svyaz>& rebra) {
+    int sk = f.size();
+    if (sk) {
+        unordered_set <int> yourchoice;
+        cout << "choice id for edit:\n";
+        int ssze = get_correct(1000, 0);
+        while (ssze) {
+            if (f.count(ssze)) {
+                yourchoice.insert(ssze);
+            }
+            ssze = get_correct(1000, 0);
+        }
+        for (int x : yourchoice) {
+            kcmap.erase(x);
+            delsvyazkc(rebra, x);
+        }
+    }
+    else
+        return;
+}
+
+void delKC_byname(unordered_map <int, KC>& kcmap, unordered_map<int, PipeAndKC::svyaz>& rebra) {
+    if (wantdelete())
+        return;
+    cout << "name: ";
+    string s;
+    INPUT_LINE(cin, s);
+    for (int t : FindKCsByFilter(kcmap, CheckByName, s)) {
+        cout << "id: " << t << endl;
+    }
+    choiceDel(kcmap, FindKCsByFilter(kcmap, CheckByName, s), rebra);
+}
+
+int Menu() {
+    unordered_map <int, KC> kcmap;
+    unordered_map <int, Pipe> pmap;
+    unordered_map <int, PipeAndKC::svyaz> rebra;
+    while (true) {
+        text_menu();
+        int choice;
+        cout << "Please choose a number from 1 to 14: ";
+        choice = get_correct(14, 1);
+        cout << endl;
+        switch (choice)
+        {
+        case 1:
+        {
+            Pipe p;
+            p.new_pipe();
+            pmap[p.getID()] = p;
+            break;
+        }
+
+        case 2:
+        {
+            KC kc;
+            kc.add_new_kc();
+            kcmap[kc.getID()] = kc;
+            break;
+        }
+        case 3:
+            if (pmap.size() != 0 && kcmap.size() == 0) {
+                cout << "Yours pipes:\n";
+                out_pmap(pmap);
+                cout << "kc - no!\n" << endl;
+                cout << endl;
+            }
+            else if (pmap.size() == 0 && kcmap.size() != 0) {
+                cout << "Yours kcs:\n";
+                out_kcmap(kcmap);
+                cout << "pipe - no!\n" << endl;
+                cout << endl;
+            }
+            else if (pmap.size() == 0 && kcmap.size() == 0) {
+                cout << "objects no!\n" << endl;
+            }
+            else {
+                cout << "Yours pipes:\n";
+                out_pmap(pmap);
+                cout << endl;
+                cout << "Yours kcs:\n";
+                out_kcmap(kcmap);
+                cout << endl;
+            }
+            break;
+
+        case 4:
+            if (pmap.size() != 0) {
+                cout << "Edit-0 or delete-1: ";
+                int i;
+                i = get_correct(1, 0);
+                if (i == 0) {
+                    editPipeINcase4(pmap);
+                }
+                else {
+                    delPipeINcase4(pmap, rebra);
+                }
+            }
+            else {
+                cout << "There is no such object\n" << endl;
+            }
+            break;
+
+        case 5:
+            if (kcmap.size() != 0) {
+                cout << "Edit-0 or delete-1: ";
+                int i;
+                i = get_correct(1, 0);
+                if (i == 0) {
+                    editKC_byname(kcmap);
+                }
+                else {
+                    delKC_byname(kcmap, rebra);
+                }
+            }
+            else {
+                cout << "There is no such object\n" << endl;
+            }
+            break;
+
+        case 6:
+            PipeAndKC pkc;
+            pkc.save_data(pmap, kcmap, rebra);
+            break;
+
+        case 7:
+            pkc.load_data(pmap, kcmap, rebra);
+            break;
+
+        case 8:
+            pkc.create_rebro(kcmap, pmap, rebra);
+            break;
+
+        case 9:
+            pkc.see_rebra(rebra);
+            break;
+
+        case 10:
+            pkc.delete_rebra(rebra);
+            break;
+
+        case 11:
+            pkc.istopol(rebra);
+            break;
+
+        case 12:
+            pkc.dejkstra(rebra, pmap);
+            break;
+
+        case 13:
+            pkc.max_potok(rebra, pmap);
+            break;
+
+        case 14:
+            return 0;
+
+        default:
+            break;
+        }
+    }
+}
+
+
+int main() {
+    redirect_output_wrapper cerr_out(cerr);
+    ofstream logfile("log_");
+    if (logfile)
+        cerr_out.redirect(logfile);
+    Menu();
+    return 0;
 }

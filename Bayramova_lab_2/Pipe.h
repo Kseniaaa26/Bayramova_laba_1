@@ -1,35 +1,33 @@
-#pragma once
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <vector>
 #include <unordered_map>
-#include <unordered_set>
+#include <fstream>
+
 using namespace std;
-class Pipe
+
+class Pipe  // труба
 {
+private:
+    int id;
+    static int MaxID;
+    string kilometr_name;
+    double length;
+    int diametr;
+    bool remont;
 
 public:
-    static int max_id;
-    string name = "";
-    bool status = 0;
-    Pipe() {
-        idp = max_id++;
-    }
-    friend istream& operator>> (istream& in, Pipe& p);
-    friend ostream& operator<< (ostream& out, Pipe& p);
-    void edit_Pipe();
-    void save_pipe(ofstream& file);
-    void load_pipe(ifstream& file);
+    int getID() const;
+    string getKmname() const;
+    bool getRepair() const;
 
-    
-    int get_id() { return idp; }
-    double get_dia() { return diameter; }
-    double getPipeLength() const {return length;}
 
-private:
-    double length = 0, diameter = 0;
-    int idp = 0;
-    
+    void new_pipe();
+    void editpipe();
 
+    static int diametr_pipe();
+
+    friend class PipeAndKC;
+    friend std::ostream& operator << (std::ostream& out, const Pipe& p);
+    friend std::ofstream& operator << (std::ofstream& fout, const Pipe& p);
+    friend std::ifstream& operator >> (std::ifstream& fin, Pipe& p);
 };

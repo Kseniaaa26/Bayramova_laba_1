@@ -1,51 +1,63 @@
 ﻿#include "CS.h"
 #include "header.h"
-#include "Graph.h"
-using namespace std;
-System t;
-int CS::max_idd = 0;
-istream& operator>> (istream& in, CS& cs)
-{
-    cout << "\nИндекс КС: " << cs.idcs;
-    cout << "\nВведите название КС ";
-    cin.clear();
-    cin.ignore(INT_MAX, '\n');
-    getline(cin, cs.name);
-    cout << "\nВведите количество цехов КС ";
-    cs.workshop = correctnumber(0, INT_MAX);
-    cout << "\nВведите количество цехов в работе ";
-    cs.working_workshop = correctnumber(0, cs.workshop);
-    cout << "\nУкажите эффективность(0 - 100) ";
-    cs.effectiveness = correctnumber(0, 100);
-    return in;
-}
-ostream& operator<< (ostream& out, CS& cs) {
-    out << "Индекс КС: " << cs.idcs << endl;
-    out << "КС: " << cs.name << endl;
-    out << "Количество цехов: " << cs.workshop << endl;
-    out << "Количество цехов в работе: " << cs.working_workshop << endl;
-    out << "Эффективность: " << cs.effectiveness << endl;
+
+int KC::MaxID = 0;
+
+ostream& operator << (ostream& out, const KC& kc) {
+    out << "kc name:" << kc.name << "\t"
+        << "kolich ceh:" << kc.kolich_ceh << "\t"
+        << "kolich_ceh_v_rabote:" << kc.kolich_ceh_v_rabote << "\t"
+        << "effectivnost:" << kc.effectivnost << endl;
     return out;
 }
-void CS::edit_cs() {
-    cout << "Цехи: " << workshop << endl;
-    cout << "Работающие цехи: " << working_workshop << endl;
-    cout << "Введите новое количество работающих цехов" << endl;
-    working_workshop = correctnumber(0, workshop);
+
+ofstream& operator << (ofstream& fout, const KC& kc) {
+    fout << "here_kc\n" << kc.id << endl << kc.name << endl << kc.kolich_ceh << endl
+        << kc.kolich_ceh_v_rabote << endl << kc.effectivnost << endl;
+    return fout;
 }
-void CS::save_cs(ofstream& file) {
-    if (file.is_open()) {
-        file << idcs << endl << name << endl
-            << workshop << endl << working_workshop << endl << effectiveness << endl;
-    }
+
+ifstream& operator >> (ifstream& fin, KC& kc) {
+    fin >> kc.id;
+    fin >> ws;
+    getline(fin, kc.name);
+    fin >> kc.kolich_ceh >> kc.kolich_ceh_v_rabote >> kc.effectivnost;
+    return fin;
 }
-void CS::load_cs(ifstream& file) {
-    if (file.is_open()) {
-        file >> idcs;
-        getline(file, name);
-        getline(file, name);
-        file >> workshop;
-        file >> working_workshop;
-        file >> effectiveness;
-    }
+
+void KC::add_new_kc() {
+    id = ++MaxID;
+    cout << "new kc\n";
+    cout << "name: ";
+    INPUT_LINE(cin, name);
+    cout << "number of workshops: ";
+    kolich_ceh = get_correct(1500, 0);
+    cout << "The number of working workshops.(An error may occur if there are more of them than the total number of workshops.): ";
+    kolich_ceh_v_rabote = get_correct(kolich_ceh, 0);
+    effectivnost = (double(kolich_ceh_v_rabote) / double(kolich_ceh)) * 100;
+    cout << endl;
+}
+
+double KC::getLoad() const {
+    return (double(kolich_ceh_v_rabote) / double(kolich_ceh)) * 100;
+}
+
+int KC::getID() const {
+    return id;
+}
+
+string KC::getname() const {
+    return name;
+}
+
+bool KC::geteffectivnost() const {
+    return effectivnost;
+}
+
+int KC::get_kcehov() const {
+    return kolich_ceh;
+}
+
+void KC::set_wcehov(int w) {
+    kolich_ceh_v_rabote = w;
 }
